@@ -1,17 +1,34 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <AdvancedChat v-if="user" :userId="user.id" :username="user.username" />
+  <AuthPage v-else></AuthPage>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import { onMounted } from "vue";
+import { register } from "vue-advanced-chat";
+import AuthPage from "@/components/auth/AuthPage.vue";
+import AdvancedChat from "@/components/chat/AdvancedChat/AdvancedChat.vue";
+import { storeToRefs } from "pinia";
+import { useAuthStore } from "@/stores/auth";
+
+register();
 
 export default {
-  name: 'App',
-  components: {
-    HelloWorld
-  }
-}
+  components: { AuthPage, AdvancedChat },
+  name: "App",
+  setup() {
+    const { user } = storeToRefs(useAuthStore());
+    const { init } = useAuthStore();
+
+    onMounted(async () => {
+      init();
+    });
+
+    return {
+      user,
+    };
+  },
+};
 </script>
 
 <style>
