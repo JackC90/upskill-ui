@@ -5,6 +5,7 @@ export const chatToMessage = (chat) => {
     username: chat.creaetedBy,
     timestamp: chat.createdAt,
     saved: !!chat.id,
+    senderId: chat.createdBy === "bot" ? 0 : chat.userId,
   };
 };
 
@@ -25,9 +26,12 @@ export const chatsToMessages = (chats) => {
   return null;
 };
 
-export const chatSessionsToRooms = (chatSessions) => {
+export const chatSessionsToRooms = (chatSessions, users) => {
   if (chatSessions?.length) {
-    return chatSessions.map((chatSession) => chatSessionToRoom(chatSession));
+    return chatSessions.map((chatSession) => ({
+      ...chatSessionToRoom(chatSession),
+      users,
+    }));
   }
   return null;
 };

@@ -1,43 +1,58 @@
 <template>
   <div>
-    <form @submit.prevent="submitLogin">
-      <FormKit
-        type="email"
+    <Form
+      :model="formState"
+      :label-col="{ span: 8 }"
+      :wrapper-col="{ span: 16 }"
+      autocomplete="off"
+      @finish="onFinish"
+      @finishFailed="onFinishFailed"
+    >
+      <FormItem
         label="Email"
-        :validation="[['required']]"
-        v-model="data.email"
-      />
+        name="email"
+        :rules="[{ required: true, message: 'Please input your email!' }]"
+      >
+        <Input type="email" v-model:value="formState.email" />
+      </FormItem>
 
-      <FormKit
-        type="password"
+      <FormItem
         label="Password"
-        :validation="[['required']]"
-        v-model="data.password"
-      />
+        name="password"
+        :rules="[{ required: true, message: 'Please input your password!' }]"
+      >
+        <InputPassword v-model:value="formState.password" />
+      </FormItem>
 
-      <FormKit type="submit">Login</FormKit>
-    </form>
+      <FormItem :wrapper-col="{ offset: 8, span: 16 }">
+        <Button type="primary" html-type="submit">Login</Button>
+      </FormItem>
+    </Form>
   </div>
 </template>
 
 <script>
 import { ref } from "vue";
-import { FormKit } from "@formkit/vue";
+import { Button, Form, FormItem, Input, InputPassword } from "ant-design-vue";
 
 export default {
   components: {
-    FormKit,
+    Form,
+    FormItem,
+    Input,
+    Button,
+    InputPassword,
   },
   setup(props, { emit }) {
-    const data = ref({
-      email: null,
-      password: null,
+    const formState = ref({
+      email: "",
+      password: "",
     });
 
     return {
-      data,
-      submitLogin() {
-        emit("submitLogin", data.value);
+      formState,
+      onFinish(values) {
+        emit("submitLogin", values);
       },
     };
   },
