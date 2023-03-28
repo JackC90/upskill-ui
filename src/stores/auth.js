@@ -9,25 +9,28 @@ export const useAuthStore = defineStore("auth", {
     async init() {
       try {
         const token = localStorage.getItem("token");
-
         let user;
         if (token) {
           user = jwt_decode(token);
         }
-        // Call user
-        const _userInfo = await axios.get("/user");
-        if (_userInfo) {
-          this.user = user;
-        } else {
-          await this.actions.onLogout();
+
+        if (user) {
+          // Call user
+          const _userInfo = await axios.get("/user");
+          if (_userInfo) {
+            this.user = user;
+          } else {
+            await this.onLogout();
+          }
         }
       } catch (err) {
-        this.actions.onLogout();
+        this.onLogout();
         throw Error(err);
       }
     },
     async onRegister(values) {
       try {
+        debugger;
         const resp = await axios.post("/register", values);
         const token = resp.data.token;
         localStorage.setItem("token", token);
@@ -38,11 +41,13 @@ export const useAuthStore = defineStore("auth", {
         }
         this.user = user;
       } catch (err) {
+        debugger;
         throw Error(err);
       }
     },
     async onLogin(values) {
       try {
+        debugger;
         const resp = await axios.post("/login", values);
         const token = resp.data.token;
         localStorage.setItem("token", token);

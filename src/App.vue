@@ -1,5 +1,5 @@
 <template>
-  <AdvancedChat v-if="user" :userId="user.id" :username="user.username" />
+  <ChatWindow v-if="user" />
   <AuthPage v-else></AuthPage>
 </template>
 
@@ -7,15 +7,16 @@
 import "ant-design-vue/es/form/style/css";
 import "ant-design-vue/es/button/style/css";
 import "ant-design-vue/es/input/style/css";
+import "ant-design-vue/es/card/style/css";
 
 import { onMounted } from "vue";
 import AuthPage from "@/components/auth/AuthPage.vue";
-import AdvancedChat from "@/components/chat/AdvancedChat/AdvancedChat.vue";
+import ChatWindow from "@/components/chat/ChatWindow/ChatWindow.vue";
 import { storeToRefs } from "pinia";
 import { useAuthStore } from "@/stores/auth";
 
 export default {
-  components: { AuthPage, AdvancedChat },
+  components: { AuthPage, ChatWindow },
   name: "App",
   setup() {
     const { user } = storeToRefs(useAuthStore());
@@ -37,11 +38,13 @@ export default {
 
 #app {
   font-family: Montserrat, Helvetica, Arial, sans-serif;
+  font-size: 16px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+  height: 100vh;
+  width: 100vw;
 }
 
 ::-webkit-scrollbar-track {
@@ -53,6 +56,10 @@ export default {
 ::-webkit-scrollbar {
   width: 10px;
   background-color: #f5f5f5;
+}
+
+::-webkit-scrollbar:horizontal {
+  height: 10px;
 }
 
 ::-webkit-scrollbar-thumb {

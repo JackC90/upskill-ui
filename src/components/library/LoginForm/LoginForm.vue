@@ -24,8 +24,8 @@
         <InputPassword v-model:value="formState.password" />
       </FormItem>
 
-      <FormItem :wrapper-col="{ offset: 8, span: 16 }">
-        <Button type="primary" html-type="submit">Login</Button>
+      <FormItem :wrapper-col="{ offset: 0, span: 24 }">
+        <Button type="primary" :block="true" html-type="submit">Login</Button>
       </FormItem>
     </Form>
   </div>
@@ -49,11 +49,14 @@ export default {
       password: "",
     });
 
+    const onFinishFailed = () => {};
+
     return {
       formState,
       onFinish(values) {
         emit("submitLogin", values);
       },
+      onFinishFailed,
     };
   },
 };
