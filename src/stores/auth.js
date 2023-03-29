@@ -30,7 +30,6 @@ export const useAuthStore = defineStore("auth", {
     },
     async onRegister(values) {
       try {
-        debugger;
         const resp = await axios.post("/register", values);
         const token = resp.data.token;
         localStorage.setItem("token", token);
@@ -41,13 +40,11 @@ export const useAuthStore = defineStore("auth", {
         }
         this.user = user;
       } catch (err) {
-        debugger;
         throw Error(err);
       }
     },
     async onLogin(values) {
       try {
-        debugger;
         const resp = await axios.post("/login", values);
         const token = resp.data.token;
         localStorage.setItem("token", token);
