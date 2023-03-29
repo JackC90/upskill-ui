@@ -16,7 +16,7 @@ export const getChatSessions = async () => {
 };
 
 export const createChat = async (data) => {
-  const res = await axios.post("/chats/", data);
+  const res = await axios.post("/chats", data);
   return res?.data;
 };
 

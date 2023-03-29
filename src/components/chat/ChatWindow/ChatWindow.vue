@@ -2,7 +2,8 @@
   <section class="msger">
     <header class="msger-header">
       <div class="msger-header-title">
-        <i class="fas fa-bug"></i> myTestbot <i class="fas fa-bug"></i>
+        <i class="fas fa-bug"></i> {{ get(chatSession, "name", "") }}
+        <i class="fas fa-bug"></i>
       </div>
     </header>
 
@@ -95,16 +96,21 @@ export default {
       messages.value = [];
     };
 
-    const createMessage = async (messageText) => {
+    const createMessage = async (e) => {
+      e.preventDefault();
+      const messageText = get(e, "target[0].value");
       const res = await createChat({
-        chat_session_id: selectedChatSessionId.value?.id,
+        chat_session_id: selectedChatSessionId.value,
         message_text: messageText,
       });
       const _messages = [...(messages.value || []), res?.user, res?.bot];
       messages.value = _messages;
+
+      e.target[0].value = "";
     };
 
     return {
+      get,
       userInfo,
       messages,
       chatSession,
