@@ -1,11 +1,6 @@
 <template>
   <div class="msg" :class="`${side}-msg`">
-    <div
-      class="msg-img"
-      :style="`background-image: url('~@/assets/images/${
-        userId ? 'people' : 'robot'
-      }-dialog.png')`"
-    ></div>
+    <div class="msg-img" :style="`background-image: url('${image}')`"></div>
 
     <div class="msg-bubble">
       <div class="msg-info">
@@ -32,9 +27,8 @@ export default {
       type: Number,
       default: 0,
     },
-    username: {
+    createdBy: {
       type: String,
-      default: "Bot",
     },
     messageText: {
       type: String,
@@ -42,19 +36,25 @@ export default {
     dateTime: {
       type: String,
     },
-    side: {
-      type: String,
-      default: "left",
-    },
   },
-  setup() {
-    return { displayTime };
+  setup(props) {
+    const isUser = props.createdBy === "user";
+    const username = isUser ? "You" : "Bot";
+    const side = isUser ? "right" : "left";
+    const image = require(`@/assets/images/${
+      isUser ? "people" : "robot"
+    }-dialog.png`);
+
+    return { isUser, side, image, username, displayTime };
   },
 };
 </script>
 
 <style scoped>
 .msg {
+  --left-msg-bg: #ececec;
+  --right-msg-bg: #579ffb;
+
   display: flex;
   align-items: flex-end;
   margin-bottom: 10px;

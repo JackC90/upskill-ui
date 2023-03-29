@@ -36,6 +36,12 @@ export default {
 <style>
 @import url("https://fonts.googleapis.com/css2?family=Montserrat");
 
+:root {
+  --body-bg: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  --msger-bg: #fff;
+  --border: 2px solid #ddd;
+}
+
 #app {
   font-family: Montserrat, Helvetica, Arial, sans-serif;
   font-size: 16px;
