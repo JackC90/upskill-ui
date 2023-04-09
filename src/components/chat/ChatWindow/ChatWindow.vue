@@ -51,6 +51,7 @@ export default {
     const userInfo = ref(null);
     const chatSession = ref(null);
     const selectedChatSessionId = ref(null);
+    const chatSessionStatus = ref(null);
 
     onMounted(async () => {
       const _userInfo = await getUser();
@@ -72,6 +73,7 @@ export default {
       if (chatSession.value?.id !== selectedChatSessionId) {
         const _chatSession = await getChatSession(selectedChatSessionId);
         chatSession.value = _chatSession;
+        chatSessionStatus.value = _chatSession?.status;
 
         if (_chatSession) {
           messages.value = _chatSession.chats;
@@ -84,6 +86,7 @@ export default {
         name: userInfo.value.username,
       });
       chatSession.value = _chatSession;
+      chatSessionStatus.value = _chatSession?.status;
 
       if (_chatSession) {
         messages.value = _chatSession.chats;
@@ -103,7 +106,9 @@ export default {
         chat_session_id: selectedChatSessionId.value,
         message_text: messageText,
       });
+
       const _messages = [...(messages.value || []), res?.user, res?.bot];
+      chatSessionStatus.value = res?.status;
       messages.value = _messages;
 
       e.target[0].value = "";

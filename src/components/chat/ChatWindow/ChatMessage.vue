@@ -8,8 +8,17 @@
         <div class="msg-info-time">{{ displayTime(dateTime) }}</div>
       </div>
 
-      <div class="msg-text">
-        {{ messageText }}
+      <div class="msg-text" v-html="messageText"></div>
+
+      <div class="options-container" v-if="options && options.length">
+        <Button
+          v-for="opt in options"
+          class="option"
+          :key="opt.id"
+          @click="$emit('select-option', opt)"
+        >
+          {{ opt.label }}
+        </Button>
       </div>
     </div>
   </div>
@@ -17,8 +26,12 @@
 
 <script>
 import { displayTime } from "@/plugins/display";
+import { Button } from "ant-design-vue";
 
 export default {
+  components: {
+    Button,
+  },
   props: {
     id: {
       type: Number,
@@ -35,6 +48,10 @@ export default {
     },
     dateTime: {
       type: String,
+    },
+    options: {
+      type: Array,
+      default: () => null,
     },
   },
   setup(props) {
@@ -89,6 +106,9 @@ export default {
 .msg-info-time {
   font-size: 0.85em;
 }
+.msg-text {
+  text-align: left;
+}
 
 .left-msg .msg-bubble {
   border-bottom-left-radius: 0;
@@ -104,5 +124,9 @@ export default {
 }
 .right-msg .msg-img {
   margin: 0 0 0 10px;
+}
+
+.option {
+  margin: 0.5rem 0.2rem 0.2rem;
 }
 </style>
