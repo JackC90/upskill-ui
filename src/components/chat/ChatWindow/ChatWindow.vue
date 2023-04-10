@@ -7,29 +7,33 @@
       </div>
     </header>
 
-    <main class="msger-chat">
+    <main class="msger-chat" :ref="chatWindow">
       <ChatMessage
         v-for="msg in messages"
         :key="msg.id"
         v-bind="msg"
         :username="msg.createdBy === 'user' ? userInfo.id : 'Bot'"
+        @select-option="onSelectOption"
       />
     </main>
 
-    <form class="msger-inputarea" @submit="createMessage">
+    <form class="msger-inputarea" @submit="submitMessage">
       <input
         type="text"
         class="msger-input"
         id="textInput"
         placeholder="Enter your message..."
+        :ref="messageInput"
       />
-      <button type="submit" class="msger-send-btn">Send</button>
+      <Button type="submit" class="msger-send-btn">Send</Button>
     </form>
   </section>
 </template>
 
 <script>
-import { onMounted, ref, watch } from "vue";
+import { onMounted, ref, watch, onUpdated } from "vue";
+import scrollIntoView from "scroll-into-view-if-needed";
+import { Button } from "ant-design-vue";
 import ChatMessage from "@/components/chat/ChatWindow/ChatMessage.vue";
 import get from "lodash.get";
 
@@ -45,8 +49,13 @@ import {
 export default {
   components: {
     ChatMessage,
+    Button,
   },
   setup() {
+    // Template refs
+    const chatWindow = ref(null);
+    const messageInput = ref(null);
+
     const messages = ref([]);
     const userInfo = ref(null);
     const chatSession = ref(null);
@@ -99,9 +108,7 @@ export default {
       messages.value = [];
     };
 
-    const createMessage = async (e) => {
-      e.preventDefault();
-      const messageText = get(e, "target[0].value");
+    const createMessage = async ({ messageText }) => {
       const res = await createChat({
         chat_session_id: selectedChatSessionId.value,
         message_text: messageText,
@@ -110,9 +117,34 @@ export default {
       const _messages = [...(messages.value || []), res?.user, res?.bot];
       chatSessionStatus.value = res?.status;
       messages.value = _messages;
+    };
 
+    const submitMessage = async (e) => {
+      e.preventDefault();
+      const messageText = get(e, "target[0].value");
+      await createMessage({ messageText });
       e.target[0].value = "";
     };
+
+    const onSelectOption = async (option) => {
+      if (option) {
+        await createMessage({ messageText: option.label });
+
+        if (messageInput.value) {
+          messageInput.value.value = "";
+        }
+      }
+    };
+
+    onUpdated(() => {
+      if (chatWindow.value) {
+        scrollIntoView(chatWindow.value, {
+          behavior: "smoooth",
+          block: "end",
+          scrollMode: "if-needed",
+        });
+      }
+    });
 
     return {
       get,
@@ -121,7 +153,10 @@ export default {
       chatSession,
       handleCreateChatSession,
       handleDeleteChatSession,
-      createMessage,
+      submitMessage,
+      onSelectOption,
+      chatWindow,
+      messageInput,
     };
   },
 };

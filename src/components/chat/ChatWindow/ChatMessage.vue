@@ -17,7 +17,7 @@
           :key="opt.id"
           @click="$emit('select-option', opt)"
         >
-          {{ opt.label }}
+          <span v-html="opt.label"></span>
         </Button>
       </div>
     </div>
