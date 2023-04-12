@@ -12,7 +12,8 @@
 
       <div class="options-container" v-if="options && options.length">
         <Button
-          v-for="opt in options"
+          v-for="opt in sortOptions(options)"
+          :disabled="disableOptions"
           class="option"
           :key="opt.id"
           @click="$emit('select-option', opt)"
@@ -53,6 +54,10 @@ export default {
       type: Array,
       default: () => null,
     },
+    disableOptions: {
+      type: Boolean,
+      default: false,
+    },
   },
   setup(props) {
     const isUser = props.createdBy === "user";
@@ -62,7 +67,16 @@ export default {
       isUser ? "people" : "robot"
     }-dialog.png`);
 
-    return { isUser, side, image, username, displayTime };
+    const sortOptions = (options) => {
+      if (Array.isArray(options)) {
+        return options.sort((a, b) => {
+          return a.order - b.order;
+        });
+      }
+      return options;
+    };
+
+    return { isUser, side, image, username, displayTime, sortOptions };
   },
 };
 </script>
@@ -74,7 +88,7 @@ export default {
 
   display: flex;
   align-items: flex-end;
-  margin-bottom: 10px;
+  padding-bottom: 10px;
 }
 
 .msg-img {

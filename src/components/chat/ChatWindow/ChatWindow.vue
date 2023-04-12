@@ -5,35 +5,62 @@
         <i class="fas fa-bug"></i> {{ get(chatSession, "name", "") }}
         <i class="fas fa-bug"></i>
       </div>
+
+      <div>
+        <Button
+          type="ghost"
+          html-type="button"
+          class="new-session-btn"
+          @click="handleCreateChatSession"
+          >New</Button
+        >
+      </div>
     </header>
 
-    <main class="msger-chat" :ref="chatWindow">
+    <main class="msger-chat" ref="chatWindow">
       <ChatMessage
-        v-for="msg in messages"
+        v-for="(msg, index) in messages"
         :key="msg.id"
         v-bind="msg"
         :username="msg.createdBy === 'user' ? userInfo.id : 'Bot'"
         @select-option="onSelectOption"
+        :disableOptions="index !== messages.length - 1"
       />
     </main>
 
     <form class="msger-inputarea" @submit="submitMessage">
-      <input
-        type="text"
+      <Textarea
+        v-model:value="messageText"
         class="msger-input"
         id="textInput"
         placeholder="Enter your message..."
-        :ref="messageInput"
+        ref="messageInput"
+        :auto-size="{ minRows: 2, maxRows: 12 }"
       />
-      <Button type="submit" class="msger-send-btn">Send</Button>
+      <Button
+        type="primary"
+        html-type="submit"
+        class="msger-send-btn"
+        :disabled="!messageText"
+        >Send</Button
+      >
     </form>
+
+    <Button
+      v-if="chatSessionStatus === 'ready'"
+      :block="true"
+      html-type="button"
+      class="success-btn"
+      @click="handleGenerateResults"
+      >Get results!</Button
+    >
   </section>
 </template>
 
 <script>
 import { onMounted, ref, watch, onUpdated } from "vue";
 import scrollIntoView from "scroll-into-view-if-needed";
-import { Button } from "ant-design-vue";
+import { Button, Textarea } from "ant-design-vue";
 import ChatMessage from "@/components/chat/ChatWindow/ChatMessage.vue";
 import get from "lodash.get";
 
@@ -45,17 +72,22 @@ import {
   createChatSession,
   deleteChatSession,
 } from "@/services/chats";
+import { generateResults } from "@/services/results";
 
 export default {
   components: {
     ChatMessage,
     Button,
+    Textarea,
   },
   setup() {
     // Template refs
     const chatWindow = ref(null);
     const messageInput = ref(null);
+    // Bind message text to this variable
+    const messageText = ref("");
 
+    const isFirstLoad = ref(true);
     const messages = ref([]);
     const userInfo = ref(null);
     const chatSession = ref(null);
@@ -96,10 +128,9 @@ export default {
       });
       chatSession.value = _chatSession;
       chatSessionStatus.value = _chatSession?.status;
+      selectedChatSessionId.value = _chatSession?.id;
 
-      if (_chatSession) {
-        messages.value = _chatSession.chats;
-      }
+      messages.value = _chatSession?.chats;
     };
 
     const handleDeleteChatSession = async (id) => {
@@ -108,10 +139,11 @@ export default {
       messages.value = [];
     };
 
-    const createMessage = async ({ messageText }) => {
+    const createMessage = async ({ messageText, optionId }) => {
       const res = await createChat({
         chat_session_id: selectedChatSessionId.value,
         message_text: messageText,
+        option_id: optionId,
       });
 
       const _messages = [...(messages.value || []), res?.user, res?.bot];
@@ -128,7 +160,7 @@ export default {
 
     const onSelectOption = async (option) => {
       if (option) {
-        await createMessage({ messageText: option.label });
+        await createMessage({ messageText: option.label, optionId: option.id });
 
         if (messageInput.value) {
           messageInput.value.value = "";
@@ -138,17 +170,32 @@ export default {
 
     onUpdated(() => {
       if (chatWindow.value) {
-        scrollIntoView(chatWindow.value, {
-          behavior: "smoooth",
+        const children = chatWindow.value.children;
+        const lastChild = children[children.length - 1];
+
+        scrollIntoView(lastChild, {
+          behavior: isFirstLoad.value ? "auto" : "smooth",
           block: "end",
           scrollMode: "if-needed",
         });
+
+        if (isFirstLoad.value) {
+          isFirstLoad.value = false;
+        }
       }
     });
+
+    const handleGenerateResults = async () => {
+      if (chatSessionStatus.value === "ready") {
+        const res = await generateResults(selectedChatSessionId.value);
+        return res;
+      }
+    };
 
     return {
       get,
       userInfo,
+      messageText,
       messages,
       chatSession,
       handleCreateChatSession,
@@ -157,6 +204,7 @@ export default {
       onSelectOption,
       chatWindow,
       messageInput,
+      handleGenerateResults,
     };
   },
 };
@@ -204,7 +252,8 @@ body {
 }
 
 .msger-header {
-  /* display: flex; */
+  display: flex;
+  flex-direction: row;
   font-size: medium;
   justify-content: space-between;
   padding: 10px;
@@ -212,6 +261,11 @@ body {
   border-bottom: var(--border);
   /* background: #eee; */
   color: #666;
+}
+
+.new-session-btn {
+  padding-left: 1rem;
+  padding-right: 1rem;
 }
 
 .msger-chat {
@@ -245,19 +299,17 @@ body {
   background: #ddd;
 }
 .msger-send-btn {
-  margin-left: 10px;
-  background: rgb(0, 196, 65);
-  color: #fff;
+  margin-left: 0.75rem;
   font-weight: bold;
-  cursor: pointer;
-  transition: background 0.23s;
-}
-.msger-send-btn:hover {
-  background: rgb(0, 180, 50);
+  height: 100%;
 }
 
 .msger-chat {
   background-color: #fcfcfe;
   background-image: url("@/assets/images/Job-Board-Header-Background.png");
+}
+
+.success-btn {
+  background-color: rgb(21, 197, 21);
 }
 </style>
