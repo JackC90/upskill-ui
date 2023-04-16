@@ -5,7 +5,7 @@
     <div class="msg-bubble">
       <div class="msg-info">
         <div class="msg-info-name" :key="userId">{{ username }}</div>
-        <div class="msg-info-time">{{ displayTime(dateTime) }}</div>
+        <div class="msg-info-time">{{ displayTime(updatedAt) }}</div>
       </div>
 
       <div class="msg-text" v-html="messageText"></div>
@@ -47,7 +47,7 @@ export default {
     messageText: {
       type: String,
     },
-    dateTime: {
+    updatedAt: {
       type: String,
     },
     options: {
@@ -88,7 +88,7 @@ export default {
 
   display: flex;
   align-items: flex-end;
-  padding-bottom: 10px;
+  padding-bottom: 1rem;
 }
 
 .msg-img {
@@ -118,7 +118,7 @@ export default {
   font-weight: bold;
 }
 .msg-info-time {
-  font-size: 0.85em;
+  font-size: 60%;
 }
 .msg-text {
   text-align: left;

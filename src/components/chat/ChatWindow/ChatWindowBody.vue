@@ -1,94 +1,69 @@
-<template>
-  <section class="msger">
-    <div :class="`msger__chat-list-container ${isOpenSidebar ? '--open' : ''}`">
-      <ChatList
-        v-if="chatSessions && chatSessions.length"
-        :chatSessions="chatSessions"
-        @selectItem="selectChatSession"
-        @createChatSession="handleCreateChatSession"
-        @close="toggleOpenSidebar"
+<!-- <template>
+  <div class="msger-body">
+    <header class="msger-header">
+      <div class="msger-toggle-side">
+        <Button
+          type="ghost"
+          @click="toggleOpenSidebar"
+          class="msger-toggle-side-btn"
+          >More</Button
+        >
+      </div>
+
+      <div class="msger-header-title">
+        <i class="fas fa-bug"></i> {{ get(chatSession, "name", "") }}
+        <i class="fas fa-bug"></i>
+      </div>
+    </header>
+
+    <main class="msger-chat" ref="chatWindow">
+      <ChatMessage
+        v-for="(msg, index) in messages"
+        :key="msg.id"
+        v-bind="msg"
+        :username="msg.createdBy === 'user' ? userInfo.id : 'Bot'"
+        @select-option="onSelectOption"
+        :disableOptions="index !== messages.length - 1"
       />
+    </main>
+
+    <div class="msger-inputarea-container">
+      <transition name="fade"
+        ><Button
+          v-if="
+            chatSessionStatus === 'ready' || chatSessionStatus === 'complete'
+          "
+          :block="true"
+          html-type="button"
+          class="msger__success-btn"
+          @click="handleGenerateResults"
+          >Get results!</Button
+        ></transition
+      >
+
+      <form @submit="submitMessage" class="msger-inputarea">
+        <Textarea
+          v-model:value="messageText"
+          class="msger-input"
+          id="textInput"
+          placeholder="Enter your message..."
+          ref="messageInput"
+          :auto-size="{ minRows: 4, maxRows: 12 }"
+        />
+        <Button
+          type="primary"
+          html-type="submit"
+          class="msger-send-btn"
+          :disabled="!messageText"
+          >Send</Button
+        >
+      </form>
     </div>
-
-    <div class="msger-content">
-      <header class="msger-header">
-        <div class="msger-toggle-side">
-          <Button
-            type="ghost"
-            @click="toggleOpenSidebar"
-            class="msger-toggle-side-btn"
-            >More</Button
-          >
-        </div>
-
-        <div class="msger-header-title">
-          <i class="fas fa-bug"></i> {{ get(chatSession, "name", "") }}
-          <i class="fas fa-bug"></i>
-        </div>
-      </header>
-
-      <div class="msger-result-body" v-if="results && Array.isArray(results)">
-        <ResultsIndex :results="results" :fetchResult="fetchResult" />
-      </div>
-
-      <div v-else class="msger-body">
-        <main class="msger-chat" ref="chatWindow">
-          <ChatMessage
-            v-for="(msg, index) in messages"
-            :key="msg.id"
-            v-bind="msg"
-            :username="msg.createdBy === 'user' ? userInfo.id : 'Bot'"
-            @select-option="onSelectOption"
-            :disableOptions="index !== messages.length - 1"
-          />
-        </main>
-
-        <div class="msger-inputarea-container">
-          <transition name="fade"
-            ><Button
-              v-if="
-                chatSessionStatus === 'ready' ||
-                chatSessionStatus === 'complete'
-              "
-              :block="true"
-              html-type="button"
-              class="msger__success-btn"
-              @click="handleGenerateResults"
-              >Get results!</Button
-            ></transition
-          >
-
-          <form @submit="submitMessage" class="msger-inputarea">
-            <Textarea
-              v-model:value="messageText"
-              class="msger-input"
-              id="textInput"
-              placeholder="Enter your message..."
-              ref="messageInput"
-              :auto-size="{ minRows: 4, maxRows: 12 }"
-            />
-            <Button
-              type="primary"
-              html-type="submit"
-              class="msger-send-btn"
-              :disabled="!messageText"
-              >Send</Button
-            >
-          </form>
-        </div>
-      </div>
-
-      <transition name="fade">
-        <div class="msger__load" v-if="isLoading">
-          <LoadingBar />
-        </div>
-      </transition>
-    </div>
-  </section>
+  </div>
 </template>
 
 <script setup>
-import { onMounted, ref, watch, onUpdated } from "vue";
+import { ref, watch, onUpdated } from "vue";
 
 // plugins
 import get from "lodash.get";
@@ -97,19 +72,25 @@ import scrollIntoView from "scroll-into-view-if-needed";
 // components
 import { Button, Textarea } from "ant-design-vue";
 import ChatMessage from "@/components/chat/ChatWindow/ChatMessage.vue";
-import ChatList from "@/components/chat/ChatWindow/ChatList.vue";
-import ResultsIndex from "@/components/chat/Results/ResultsIndex.vue";
-import LoadingBar from "@/components/library/LoadingBar/LoadingBar.vue";
 
-// API
-import { getUser } from "@/services/user";
-import {
-  getChatSessions,
-  getChatSession,
-  createChat,
-  createChatSession,
-} from "@/services/chats";
-import { generateResults, getResult } from "@/services/results";
+const props = defineProps({
+  chatSessions: {
+    type: Array,
+    default: null
+  },
+  messages: {
+    type: Array,
+    default: null
+  },
+  userInfo: {
+    type: Object,
+    default: null
+  },
+  chatSession: {
+    type: Object,
+    default: null
+  },
+});
 
 // Template refs
 const chatWindow = ref(null);
@@ -117,7 +98,6 @@ const messageInput = ref(null);
 // Bind message text to this variable
 const messageText = ref("");
 
-const isLoading = ref(false);
 const isFirstLoad = ref(true);
 const chatSessions = ref(null);
 const messages = ref([]);
@@ -137,7 +117,6 @@ const toggleOpenSidebar = () => {
 
 const selectChatSession = (item) => {
   selectedChatSessionId.value = item.id;
-  chatSessionStatus.value = item.status;
   isFirstLoad.value = true;
 };
 
@@ -148,14 +127,12 @@ onMounted(async () => {
   if (userInfo.value?.lastChatSessionId) {
     selectedChatSessionId.value = userInfo.value?.lastChatSessionId;
   } else {
-    isLoading.value = true;
     selectedChatSessionId.value = get(
       await createChatSession({
         name: _userInfo.username,
       }),
       "id"
     );
-    isLoading.value = false;
   }
 
   getChatSessionsList();
@@ -163,7 +140,6 @@ onMounted(async () => {
 
 watch([selectedChatSessionId], async ([selectedChatSessionId]) => {
   if (chatSession.value?.id !== selectedChatSessionId) {
-    isLoading.value = true;
     const _chatSession = await getChatSession(selectedChatSessionId);
     chatSession.value = _chatSession;
     chatSessionStatus.value = _chatSession?.status;
@@ -171,12 +147,10 @@ watch([selectedChatSessionId], async ([selectedChatSessionId]) => {
     if (_chatSession) {
       messages.value = _chatSession.chats;
     }
-    isLoading.value = false;
   }
 });
 
 const handleCreateChatSession = async () => {
-  isLoading.value = true;
   const _chatSession = await createChatSession({
     name: userInfo.value.username,
   });
@@ -187,7 +161,6 @@ const handleCreateChatSession = async () => {
   messages.value = _chatSession?.chats;
 
   getChatSessionsList();
-  isLoading.value = false;
 };
 
 const createMessage = async ({ messageText, optionId }) => {
@@ -239,39 +212,14 @@ onUpdated(() => {
   }
 });
 
-// RESULTS
-const results = ref(null);
-
-watch(
-  [selectedChatSessionId, chatSessionStatus],
-  ([selectedChatSessionId, chatSessionStatus]) => {
-    if (chatSessionStatus === "complete") {
-      handleGenerateResults(selectedChatSessionId);
-    } else {
-      // Clear results
-      results.value = null;
-    }
-  }
-);
-
 const handleGenerateResults = async () => {
   if (
     chatSessionStatus.value === "ready" ||
     chatSessionStatus.value === "complete"
   ) {
-    isLoading.value = true;
     const res = await generateResults(selectedChatSessionId.value);
-    results.value = res;
-    isLoading.value = false;
     return res;
-  } else {
-    results.value = null;
-    return null;
   }
-};
-
-const fetchResult = async (item) => {
-  return await getResult(selectedChatSessionId.value, item.id);
 };
 </script>
 
@@ -311,29 +259,13 @@ body {
   height: 100%;
 }
 
-.msger-content {
-  display: flex;
-  position: relative;
-  flex-flow: column;
-  justify-content: space-between;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-}
-
-.msger-result-body {
-  position: relative;
-  width: 100%;
-  height: calc(100% - 3rem);
-}
-
 .msger-body {
   display: flex;
   position: relative;
-  flex-flow: column;
+  flex-flow: column wrap;
   justify-content: space-between;
   width: 100%;
-  height: calc(100% - 3rem);
+  height: 100%;
   border: var(--border);
   border-radius: 5px;
   background: var(--msger-bg);
@@ -356,10 +288,9 @@ body {
   width: 0%;
   visibility: hidden;
   transition: width 200ms ease-in;
-  box-shadow: 0 10px 10px 2px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 15px 15px 15px rgba(0, 0, 0, 0.2);
   overflow-x: hidden;
   position: absolute;
-  z-index: 10;
 }
 
 .msger__chat-list-container.--open {
@@ -369,6 +300,7 @@ body {
   top: 0;
   bottom: 0;
   left: 0;
+  z-index: 10;
 }
 
 .msger-toggle-side {
@@ -405,15 +337,6 @@ body {
   display: flex;
   flex-direction: column;
   width: 100%;
-  position: relative;
-}
-
-.msger__load {
-  display: block;
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  opacity: 0.5;
 }
 
 .msger-inputarea {
@@ -470,4 +393,4 @@ body {
     box-shadow: 0 0 0 0 rgba(21, 197, 21, 0);
   }
 }
-</style>
+</style> -->

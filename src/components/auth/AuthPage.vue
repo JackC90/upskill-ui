@@ -65,11 +65,13 @@ export default {
 <style scoped>
 .page {
   width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
   margin: 0 auto;
   padding: 5rem;
+  background: url("@/assets/images/pattern.png") center;
 }
 
 .auth-card {

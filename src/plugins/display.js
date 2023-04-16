@@ -1,4 +1,7 @@
 import dayjs from "dayjs";
+var isToday = require("dayjs/plugin/isToday");
+
+dayjs.extend(isToday);
 
 export const displayTime = (dateTime) => {
   if (dateTime) {
