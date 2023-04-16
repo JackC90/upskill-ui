@@ -78,7 +78,7 @@ const closeResult = () => {
 .results__container {
   position: relative;
   width: 100%;
-  height: calc(100% - 3rem);
+  height: 100%;
   background: white;
 }
 
@@ -109,7 +109,7 @@ const closeResult = () => {
 .results__body {
   position: relative;
   width: 100%;
-  height: 100%;
+  height: calc(100% - 3rem);
 }
 
 .results__body-content {
@@ -133,7 +133,7 @@ hr {
 
 .results__item-content {
   width: 100%;
-  padding: 0.5rem 0.5rem;
+  padding: 0.5rem 2rem;
 }
 
 .results__item-title {
@@ -150,7 +150,7 @@ hr {
 .results__item-description {
   width: 100%;
   font-size: 80%;
-  height: 6rem;
+  height: 5rem;
   position: relative;
   padding: 0.25rem 0;
   overflow: hidden;

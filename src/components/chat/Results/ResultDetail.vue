@@ -21,12 +21,12 @@
           {{ result.occupation.description }}
         </div>
 
-        <div class="resultDetail__item-description">
-          <ol>
+        <div class="resultDetail__item-infos">
+          <ul>
             <li v-for="task in splitTasks" :key="task">
               {{ task }}
             </li>
-          </ol>
+          </ul>
         </div>
       </div>
     </div>
@@ -50,12 +50,14 @@ const props = defineProps({
 
 const splitText = (text) => {
   if (text) {
-    return text.split("\n");
+    return text.split("\t");
   }
   return [];
 };
 
-const splitTasks = computed(() => splitText(props.result.occupation.tasks));
+const splitTasks = computed(() => {
+  return splitText(props.result.occupation.task);
+});
 </script>
 
 <style scoped>
@@ -93,15 +95,19 @@ const splitTasks = computed(() => splitText(props.result.occupation.tasks));
 
 .resultDetail__body {
   width: 100%;
+  height: calc(100% - 3rem);
 }
 
 .resultDetail__body-content {
   width: 100%;
+  height: 100%;
 }
 
 .resultDetail__item-content {
   width: 100%;
-  padding: 0.5rem 0.5rem;
+  height: 100%;
+  padding: 2rem 2rem;
+  overflow-y: auto;
 }
 
 .resultDetail__item-title {
@@ -117,5 +123,11 @@ const splitTasks = computed(() => splitText(props.result.occupation.tasks));
 
 .resultDetail__item-description {
   width: 100%;
+}
+
+.resultDetail__item-infos {
+  text-align: left;
+  width: 100%;
+  padding: 2rem 0;
 }
 </style>
