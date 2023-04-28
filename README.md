@@ -1,7 +1,10 @@
 # upskill-ui
 
 ## Project setup
-For prodedure in installing NodeJS and NPM follow the  see [Configuration Reference](https://learn.microsoft.com/en-us/microsoft-edge/visual-studio-code/microsoft-edge-devtools-extension/install)
+
+### Require Packages
+
+For prodedure in installing NodeJS and NPM follow [Configuration Reference](https://learn.microsoft.com/en-us/microsoft-edge/visual-studio-code/microsoft-edge-devtools-extension/install) prior to running the below commands.
 
 ```
 npm install
