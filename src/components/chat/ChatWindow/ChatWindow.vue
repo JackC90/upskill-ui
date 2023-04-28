@@ -16,7 +16,7 @@
           <Button
             type="ghost"
             @click="toggleOpenSidebar"
-            class="msger-toggle-side-btn"
+            class="msger-toggle-side-btn btn"
             >More</Button
           >
         </div>
@@ -24,6 +24,12 @@
         <div class="msger-header-title">
           <i class="fas fa-bug"></i> {{ get(chatSession, "name", "") }}
           <i class="fas fa-bug"></i>
+        </div>
+
+        <div class="msger-logout">
+          <Button type="ghost" @click="logout" class="msger-logout-btn btn"
+            >Logout</Button
+          >
         </div>
       </header>
 
@@ -88,7 +94,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref, watch, onUpdated } from "vue";
+import { onMounted, ref, watch, onUpdated, defineEmits } from "vue";
 
 // plugins
 import get from "lodash.get";
@@ -109,7 +115,7 @@ import {
   createChat,
   createChatSession,
 } from "@/services/chats";
-import { generateResults, getResult } from "@/services/results";
+import { generateResults, getOccupation } from "@/services/results";
 
 // Template refs
 const chatWindow = ref(null);
@@ -126,6 +132,12 @@ const chatSession = ref(null);
 const selectedChatSessionId = ref(null);
 const chatSessionStatus = ref(null);
 const isOpenSidebar = ref(false);
+
+const emit = defineEmits(["logout"]);
+
+const logout = () => {
+  emit("logout");
+};
 
 const getChatSessionsList = async () => {
   chatSessions.value = await getChatSessions();
@@ -271,7 +283,7 @@ const handleGenerateResults = async () => {
 };
 
 const fetchResult = async (item) => {
-  return await getResult(selectedChatSessionId.value, item.id);
+  return await getOccupation(item.occupationId);
 };
 </script>
 
@@ -301,7 +313,6 @@ body {
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-image: var(--body-bg);
 }
 
 .msger {
@@ -336,14 +347,13 @@ body {
   height: calc(100% - 3rem);
   border: var(--border);
   border-radius: 5px;
-  background: var(--msger-bg);
 }
 
 .msger-header {
   display: flex;
   flex-direction: row;
   font-size: medium;
-  /* justify-content: space-between; */
+  justify-content: space-between;
   padding: 10px;
   text-align: center;
   border-bottom: var(--border);
@@ -413,7 +423,6 @@ body {
   width: 100%;
   height: 100%;
   position: absolute;
-  opacity: 0.5;
 }
 
 .msger-inputarea {
@@ -441,7 +450,7 @@ body {
 
 .msger-chat {
   background-color: #fcfcfe;
-  background-image: url("@/assets/images/Job-Board-Header-Background.png");
+  /* background-image: url("@/assets/images/Job-Board-Header-Background.png"); */
 }
 
 .msger__success-btn {

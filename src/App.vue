@@ -1,6 +1,6 @@
 <template>
   <LoadingBar v-if="loading"></LoadingBar>
-  <ChatWindow v-else-if="user" />
+  <ChatWindow @logout="onLogout" v-else-if="user" />
   <AuthPage v-else></AuthPage>
 </template>
 
@@ -9,6 +9,7 @@ import "ant-design-vue/es/form/style/css";
 import "ant-design-vue/es/button/style/css";
 import "ant-design-vue/es/input/style/css";
 import "ant-design-vue/es/card/style/css";
+import "ant-design-vue/es/collapse/style/css";
 
 import { onMounted } from "vue";
 
@@ -20,7 +21,7 @@ import { storeToRefs } from "pinia";
 import { useAuthStore } from "@/stores/auth";
 
 const { user, loading } = storeToRefs(useAuthStore());
-const { init } = useAuthStore();
+const { init, onLogout } = useAuthStore();
 
 onMounted(async () => {
   init();
@@ -34,6 +35,7 @@ onMounted(async () => {
   --body-bg: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
   --msger-bg: #fff;
   --border: 2px solid #ddd;
+  --primary-color: rgba(207, 77, 254, 1);
 }
 
 #app {
@@ -45,6 +47,10 @@ onMounted(async () => {
   color: #2c3e50;
   height: 100vh;
   width: 100vw;
+}
+
+.btn {
+  padding: 0 0.5rem;
 }
 
 ::-webkit-scrollbar {

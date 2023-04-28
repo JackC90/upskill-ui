@@ -1,7 +1,7 @@
 <template>
   <div class="resultDetail__container">
     <div class="resultDetail__head">
-      <div class="resultDetail__head-title">{{ result.occupation.title }}</div>
+      <div class="resultDetail__head-title">{{ occupation.title }}</div>
       <div class="resultDetail__head-btns">
         <Button
           type="ghost"
@@ -14,19 +14,21 @@
     </div>
     <div class="resultDetail__body">
       <div class="resultDetail__item-content">
-        <div class="resultDetail__item-code">
-          O*Net SOC {{ result.occupation.id }}
-        </div>
+        <div class="resultDetail__item-code">O*Net SOC {{ occupation.id }}</div>
         <div class="resultDetail__item-description">
-          {{ result.occupation.description }}
+          {{ occupation.description }}
         </div>
 
         <div class="resultDetail__item-infos">
-          <ul>
-            <li v-for="task in splitTasks" :key="task">
-              {{ task }}
-            </li>
-          </ul>
+          <Collapse :bordered="false">
+            <CollapsePanel key="task" :header="'Work Tasks'">
+              <ul>
+                <li v-for="task in splitTasks" :key="task">
+                  {{ task }}
+                </li>
+              </ul>
+            </CollapsePanel>
+          </Collapse>
         </div>
       </div>
     </div>
@@ -35,10 +37,10 @@
 
 <script setup>
 import { computed, defineProps } from "vue";
-import { Button } from "ant-design-vue";
+import { Button, Collapse, CollapsePanel } from "ant-design-vue";
 
 const props = defineProps({
-  result: {
+  occupation: {
     type: Object,
     default: () => {
       return null;
@@ -56,7 +58,7 @@ const splitText = (text) => {
 };
 
 const splitTasks = computed(() => {
-  return splitText(props.result.occupation.task);
+  return splitText(props.occupation.task);
 });
 </script>
 

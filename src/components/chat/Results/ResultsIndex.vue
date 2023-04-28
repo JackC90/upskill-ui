@@ -31,7 +31,7 @@
     </div>
     <transition>
       <div class="results__result-container" v-if="result">
-        <ResultDetail :result="result" @close="closeResult"></ResultDetail>
+        <ResultDetail :occupation="result" @close="closeResult"></ResultDetail>
       </div>
     </transition>
   </div>

@@ -11,3 +11,8 @@ export const getResult = async (chatSessionId, resultId) => {
   );
   return res?.data;
 };
+
+export const getOccupation = async (id) => {
+  const res = await axios.get("/occupations/" + id);
+  return res?.data;
+};
