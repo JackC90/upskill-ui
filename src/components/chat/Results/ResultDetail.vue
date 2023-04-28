@@ -30,6 +30,10 @@
             </CollapsePanel>
           </Collapse>
         </div>
+
+        <div class="resultDetail__item-infos">
+          <ArcDiagram :data="careerPathsGraphData" />
+        </div>
       </div>
     </div>
   </div>
@@ -38,6 +42,9 @@
 <script setup>
 import { computed, defineProps } from "vue";
 import { Button, Collapse, CollapsePanel } from "ant-design-vue";
+import ArcDiagram from "@/components/library/ArcDiagram/ArcDiagram.vue";
+
+import { careerPathsToGraph } from "@/plugins/occupation";
 
 const props = defineProps({
   occupation: {
@@ -59,6 +66,10 @@ const splitText = (text) => {
 
 const splitTasks = computed(() => {
   return splitText(props.occupation.task);
+});
+
+const careerPathsGraphData = computed(() => {
+  return careerPathsToGraph(props.occupation.careerPaths);
 });
 </script>
 
