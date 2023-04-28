@@ -1,7 +1,7 @@
 # upskill-ui
 
 ## Project setup
-Install DevTools extension for Visual Studio See [Configuration Reference](https://learn.microsoft.com/en-us/microsoft-edge/visual-studio-code/microsoft-edge-devtools-extension/install)
+For prodedure in installing NodeJS and NPM follow the  see [Configuration Reference](https://learn.microsoft.com/en-us/microsoft-edge/visual-studio-code/microsoft-edge-devtools-extension/install)
 
 ```
 npm install
