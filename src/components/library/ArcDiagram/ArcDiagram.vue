@@ -1,5 +1,8 @@
 <template>
-  <div ref="arcDiagram"></div>
+  <div>
+    <div class="title"></div>
+    <div ref="arcDiagram" class="arc-diagram"></div>
+  </div>
 </template>
 
 <script setup>
@@ -18,16 +21,20 @@ const props = defineProps({
 const arcDiagram = ref(null);
 
 const constructArc = (element) => {
+  const width_dim = 1200;
+  const height_dim = 600;
+
+  // Refer to D3 documentation: https://d3-graph-gallery.com/graph/arc_template.html
   // set the dimensions and margins of the graph
   const margin = { top: 0, right: 30, bottom: 50, left: 60 },
-    width = 650 - margin.left - margin.right,
-    height = 400 - margin.top - margin.bottom;
+    width = width_dim - margin.left - margin.right,
+    height = height_dim - margin.top - margin.bottom;
 
   // append the svg object to the body of the page
   const svg = d3
     .select(element)
     .append("svg")
-    // .attr("viewBox", '0 0 300 600')
+    // .attr("viewBox", "0 0 300 600")
     .attr("viewBox", [0, 0, width + 90, height + 80])
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
@@ -52,8 +59,7 @@ const constructArc = (element) => {
   // A linear scale to position the nodes on the X axis
   const x = d3.scalePoint().range([0, width]).domain(allNodes);
 
-  // In my input data, links are provided between nodes -id-, NOT between node names.
-  // So I have to do a link between this id and the name
+  // In the input data, links are provided between nodes -id-.
   const idToNode = {};
   data.nodes.forEach(function (n) {
     idToNode[n.id] = n;
@@ -100,7 +106,7 @@ const constructArc = (element) => {
     .join("circle")
     .attr("cx", (d) => x(d.name))
     .attr("cy", height - 30)
-    .attr("r", (d) => size(d.n))
+    .attr("r", (d) => size(d.n * 2))
     .style("fill", (d) => color(d.grp))
     .attr("stroke", "white");
 
@@ -113,11 +119,8 @@ const constructArc = (element) => {
     .attr("y", 0)
     .text((d) => d.name)
     .style("text-anchor", "end")
-    .attr(
-      "transform",
-      (d) => `translate(${x(d.name)},${height - 15}) rotate(-45)`
-    )
-    .style("font-size", 6);
+    .attr("transform", (d) => `translate(${x(d.name)},${height - 15})`)
+    .style("font-size", 12);
 
   // Add the highlighting functionality
   nodes
@@ -138,7 +141,7 @@ const constructArc = (element) => {
           a.source === d.id || a.target === d.id ? 4 : 1
         );
       labels
-        .style("font-size", (b) => (b.name === d.name ? 18.9 : 2))
+        .style("font-size", (b) => (b.name === d.name ? 16 : 2))
         .attr("y", (b) => (b.name === d.name ? 10 : 0));
     })
     .on("mouseout", () => {
@@ -147,7 +150,7 @@ const constructArc = (element) => {
         .style("stroke", "grey")
         .style("stroke-opacity", 0.8)
         .style("stroke-width", "1");
-      labels.style("font-size", 6);
+      labels.style("font-size", 12);
     });
 };
 
@@ -155,3 +158,5 @@ onMounted(() => {
   constructArc(arcDiagram.value);
 });
 </script>
+
+<style scoped></style>

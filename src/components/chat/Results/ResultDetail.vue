@@ -31,7 +31,8 @@
           </Collapse>
         </div>
 
-        <div class="resultDetail__item-infos">
+        <h3>Career Paths</h3>
+        <div class="resultDetail__item-infos-diagram">
           <ArcDiagram :data="careerPathsGraphData" />
         </div>
       </div>
@@ -111,6 +112,10 @@ const careerPathsGraphData = computed(() => {
   height: calc(100% - 3rem);
 }
 
+.h3 {
+  font-weight: bold;
+}
+
 .resultDetail__body-content {
   width: 100%;
   height: 100%;
@@ -142,5 +147,10 @@ const careerPathsGraphData = computed(() => {
   text-align: left;
   width: 100%;
   padding: 2rem 0;
+}
+
+.resultDetail__item-infos-diagram {
+  width: 100%;
+  overflow: auto;
 }
 </style>
